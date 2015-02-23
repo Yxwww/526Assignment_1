@@ -3,24 +3,38 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 
 public class C_3_Client {
+
+    final static String trustStorePath = "key/test1/clientcert";//ia.jks";
+    final static String password = "yuxibruh"; // The Password
+    final static String server = "localhost";
+    final static int serverPort = 3456;
+    final static boolean debugEnabled = false;   // enable debug mode
+
+
     public static void main(String[] arstring) {
         try {
-            SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            SSLSocket sslsocket = (SSLSocket) sslsocketfactory.createSocket("localhost", 3000);
-
-            InputStream inputstream = System.in;
-            InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
-            BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
-
-            OutputStream outputstream = sslsocket.getOutputStream();
-            OutputStreamWriter outputstreamwriter = new OutputStreamWriter(outputstream);
-            BufferedWriter bufferedwriter = new BufferedWriter(outputstreamwriter);
-
-            String string = null;
-            while ((string = bufferedreader.readLine()) != null) {
-                bufferedwriter.write(string + '\n');
-                bufferedwriter.flush();
+            byte[] sendBytes, receiveBytes = new byte[1000];
+            // set trust property and
+            System.setProperty("javax.net.ssl.trustStore", trustStorePath);
+            System.setProperty("javax.net.ssl.trustStorePassword", password);
+            if (debugEnabled){
+                System.setProperty("javax.net.debug", "all");
             }
+            SSLSocketFactory sslsf = (SSLSocketFactory) SSLSocketFactory
+                    .getDefault();
+            SSLSocket sslSocket = (SSLSocket) sslsf.createSocket(server,serverPort);
+            OutputStream sslOS = sslSocket.getOutputStream();
+
+            InputStream sslIS = sslSocket.getInputStream();
+
+            //Read from the Client
+            BufferedReader bufferedreader = new BufferedReader( new InputStreamReader(sslIS));
+            BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));   // read user input
+            sslOS.write("Hello SSL Server".getBytes()); // Write to the Server
+            sslOS.flush();
+            sslSocket.close();
+
+
         } catch (Exception exception) {
             exception.printStackTrace();
         }

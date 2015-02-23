@@ -4,28 +4,45 @@
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public class C_2_Server {
+    // Key store infomation
+    final static String keyStorePath = "key/test1/server.keystore";
+    final static String password = "yuxibruh"; // The Password
+    final static int serverPort = 3456;
+    final static boolean debugEnabled = false;   // enable debug mode
+
     public static void main(String[] arstring) {
         try {
-            SSLServerSocketFactory sslserversocketfactory =
-                    (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-            SSLServerSocket sslserversocket =
-                    (SSLServerSocket) sslserversocketfactory.createServerSocket(3000);
-            SSLSocket sslsocket = (SSLSocket) sslserversocket.accept();
+            System.setProperty("javax.net.ssl.keyStore", keyStorePath);     // trust keystore
+            System.setProperty("javax.net.ssl.keyStorePassword", password); // keystore password
+            if (debugEnabled){
+                System.setProperty("javax.net.debug", "all");
+            }
 
-            InputStream inputstream = sslsocket.getInputStream();
-            InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
-            BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
+            SSLServerSocketFactory server = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+            SSLServerSocket sslServerSocket = (SSLServerSocket) server.createServerSocket(serverPort);
 
+            SSLSocket sslSocket = (SSLSocket) sslServerSocket.accept();
+            InputStream sslIS = sslSocket.getInputStream();
+
+            //For Writing Back to the Client
+            OutputStream sslOS = sslSocket.getOutputStream();
+
+            //Read from the Client
+            BufferedReader bufferedreader = new BufferedReader( new InputStreamReader(sslIS));
+            //System.out.println("Server listening on port" + serverPort);
             String string = null;
             while ((string = bufferedreader.readLine()) != null) {
-                System.out.println(string);
+                System.out.println("Server Received: "+ string);
                 System.out.flush();
             }
+
+
+            sslSocket.close();
+
+
         } catch (Exception exception) {
             exception.printStackTrace();
         }
