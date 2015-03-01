@@ -11,7 +11,7 @@ public class C_2_Server {
     final static String keyStorePath = "key/test1/server.keystore";
     final static String password = "yuxibruh"; // The Password
     final static int serverPort = 3456;
-    final static boolean debugEnabled = false;   // enable debug mode
+    final static boolean debugEnabled = true;   // enable debug mode
 
     public static void main(String[] arstring) {
         try {

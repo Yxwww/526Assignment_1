@@ -8,7 +8,7 @@ public class C_3_Client {
     final static String password = "yuxibruh"; // The Password
     final static String server = "localhost";
     final static int serverPort = 3456;
-    final static boolean debugEnabled = false;   // enable debug mode
+    final static boolean debugEnabled = true;   // enable debug mode
 
 
     public static void main(String[] arstring) {
@@ -31,6 +31,8 @@ public class C_3_Client {
             BufferedReader bufferedreader = new BufferedReader( new InputStreamReader(sslIS));
             BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));   // read user input
             sslOS.write("Hello SSL Server".getBytes()); // Write to the Server
+            //http://www.rgagnon.com/javadetails/java-0542.html
+            // TODO: File transfer
             sslOS.flush();
             sslSocket.close();
 

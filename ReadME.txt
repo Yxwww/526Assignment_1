@@ -12,7 +12,7 @@ C_2:
 
     #   Then, according to http://stackoverflow.com/questions/906402/importing-an-existing-x509-certificate-and-private-key-in-java-keystore-to-use-i/8224863#8224863
             we need to convert the x509 Cert and Key to a pkcs12 file, then translate to pkcs12 file that java could read.
-    Command that converts the certificate to something java could read:
+    Command:
     -   openssl pkcs12 -export -in ca.crt -inkey ca.key -out server.p12 -name serverP12 -CAfile ca.crt
     -   keytool -importkeystore -destkeystore server.keystore -srckeystore server.p12 -srcstoretype PKCS12 -srcstorepass yuxibruh
         * Note that my password was set to: yuxibruh
