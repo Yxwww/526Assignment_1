@@ -5,13 +5,30 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import java.io.*;
+import java.util.*;
 
 public class C_2_Server {
     // Key store infomation
     final static String keyStorePath = "key/test1/server.keystore";
     final static String password = "yuxibruh"; // The Password
     final static int serverPort = 3456;
-    final static boolean debugEnabled = true;   // enable debug mode
+    final static boolean debugEnabled = false;   // enable debug mode
+
+    protected static final String serverDir =  "server_data";
+    protected static String serverText = "";
+    protected static String requestHeader = "";
+    protected static String getObject = "";
+    protected static String responseHeader = "";
+
+    private static InputStream inputStream = null;
+    private static File fileToSend = null;
+    private static FileInputStream sslIS = null;
+    //BufferedInputStream bufferedInputStream = null;
+    //OutputStream sslOS = null;
+    private static OutputStream sslOS = null;
+    private static String responseType = "" ;
+    private static String relativePathOfGET = "";
+
 
     public static void main(String[] arstring) {
         try {
@@ -28,18 +45,39 @@ public class C_2_Server {
             InputStream sslIS = sslSocket.getInputStream();
 
             //For Writing Back to the Client
-            OutputStream sslOS = sslSocket.getOutputStream();
+            sslOS = sslSocket.getOutputStream();
 
             //Read from the Client
             BufferedReader bufferedreader = new BufferedReader( new InputStreamReader(sslIS));
+            BufferedInputStream inputStream = new BufferedInputStream(sslIS);
             //System.out.println("Server listening on port" + serverPort);
-            String string = null;
-            while ((string = bufferedreader.readLine()) != null) {
-                System.out.println("Server Received: "+ string);
-                System.out.flush();
+            byte[] readerBuffer = new byte[1024];
+            /*while ((string = bufferedreader.readLine()) != null) {
+                if(string!="" && string != "SHUTDOWN"){
+                    clientHandler client = new clientHandler(string);
+                }else{
+                    break;
+                }
+            }*/
+            System.out.println("Server started on localhost:"+ serverPort);
+            String readString = null;
+            clientHandler client = null;
+            while(inputStream.read(readerBuffer)!=-1) {
+                readString = new String(readerBuffer);
+                if (readString.trim().equals("SHUTDOWN")){
+                    System.out.println("SHUTDOWN message received... ");
+                    break;
+                }
+                if(!readString.equals("")){
+                    client = new clientHandler(readString,sslSocket);
+                }
+                System.out.println("");
+                readerBuffer = new byte[1024];
             }
 
-
+            inputStream.close();
+            //client.outputStream.close();
+            System.out.flush();
             sslSocket.close();
 
 
@@ -48,28 +86,3 @@ public class C_2_Server {
         }
     }
 }
-
-
-/*DatagramSocket serverSocket;
-
-
-        try {
-            serverSocket = new DatagramSocket(3000);
-        }
-        catch (IOException e)
-        {
-            System.err.println("Could not create socket on port: 3000.");
-            System.exit(1);
-            return;
-        }
-
-        DatagramPacket myPacket = new DatagramPacket(new byte[1000], 1000);
-        System.out.println ("Waiting for message.....");
-
-        while (true)
-        {
-            serverSocket.receive(myPacket);
-            System.out.println("Received the message: " + new String(myPacket.getData()));
-            serverSocket.send(myPacket);
-        }
-        */

@@ -17,19 +17,36 @@ import javax.crypto.spec.IvParameterSpec;
 public class C_1 {
 
     public static LinkedList<EncryptionEncapsulate> EncList= new LinkedList<EncryptionEncapsulate>(); // Stores info of list of ECB Files
-    private static byte[] ivBytes = new byte[]{0x03, 0x02, 0x01, 0x04, 0x05, 0x07, 0x08, 0x08};
+    private static byte[] ivBytes = new byte[]{0x03, 0x02, 0x01, 0x04, 0x05, 0x07, 0x08, 0x08}; // to Ensure randomness
     public static void main(String[] args) {
         try {
+            //String key = "yuxibruh"; // needs to be at least 8 characters for DES
+            for (String s: args) {
+                System.out.println(s);
+            }
+            if(args.length<=0){
+                System.out.println("No args ... running auto encrypt");
+            }else{
+                if(args.length==3){
+                    if(args[0].equalsIgnoreCase("encrypt")){
+                        encryptFile(args[1],args[2]);
+                    }else if(args[0].equalsIgnoreCase("decrypt")){
+                        encryptFile(args[1],args[2]);
+                    }
+                }else{
+                    System.out.println("Wrong number of keys please do: <encrypt/decrypt> <Filename> <Password>");
+                    System.exit(-1);
+                }
+            }
 
-            String key = "yuxibruh"; // needs to be at least 8 characters for DES
-            autoEncrypt(key);   // encrypt all the files from original0 -- original10 with ECB, CBC, OFB, and CFB in DES
+            //autoEncrypt(key);   // encrypt all the files from original0 -- original10 with ECB, CBC, OFB, and CFB in DES
             //FileInputStream fis2 = new FileInputStream("encrypted.txt");
             //FileOutputStream fos2 = new FileOutputStream("decrypted.txt");
             //decrypt(key, fis2, fos2);
             for(int i = 0; i<EncList.size(); i++){
                 System.out.println(EncList.get(i).toString());
             }
-            System.out.println("DONE!"+EncList.size());
+            System.out.println("DONE with "+EncList.size()+" encryption/decryption process.");
 
         } catch (Throwable e) {
             e.printStackTrace();
@@ -79,7 +96,7 @@ public class C_1 {
         Cipher cipher = Cipher.getInstance(encryptionType); // DES/ECB/PKCS5Padding for SunJCE ECB, CBC, OFB, and CFB
 
         if(!encryptionType.equalsIgnoreCase("DES/ECB/PKCS5Padding")){
-
+            // Add iv parameter for any the type other than ECB
             IvParameterSpec ivVector = new IvParameterSpec(ivBytes);
             cipher.init(Cipher.DECRYPT_MODE, desKey,ivVector);
         }else{
@@ -98,6 +115,64 @@ public class C_1 {
         is.close();
     }
 
+    public static void encryptFile(String FileName, String CipherKey) throws Throwable{
+        File theDir = new File("encryptedFiles");
+        File decDir = new File("decryptedFiles");
+        // if the encrypt decrypt directories does not exist, create it
+        if (!theDir.exists()) {
+            System.out.println("creating directory: encryptedFiles");
+            boolean result = false;
+            try {
+                theDir.mkdir();
+                result = true;
+            } catch (SecurityException se) {
+                //handle it
+            }
+            if (result) {
+                System.out.println("DIR created");
+            }
+        }
+        if (!decDir.exists()) {
+            System.out.println("creating directory: decryptedFiles");
+            boolean result = false;
+            try {
+                decDir.mkdir();
+                result = true;
+            } catch (SecurityException se) {
+                //handle it
+            }
+            if (result) {
+                System.out.println("DIR created");
+            }
+        }
+
+        String[] encryptionType = {"DES/ECB/PKCS5Padding","DES/CBC/PKCS5Padding","DES/OFB/PKCS5Padding","DES/CFB/PKCS5Padding"};
+        String currentType = "";
+        try{
+
+            for(int j=0;j<encryptionType.length;j++){
+                    String originalFileName = FileName;
+                    currentType = encryptionType[j].split("/")[1];
+                    String encryptFileName = "encryptedFiles/encrypted"+currentType+"_"+originalFileName+".txt";
+                    FileInputStream fis = new FileInputStream(originalFileName);
+                    FileOutputStream fos = new FileOutputStream(encryptFileName);
+
+                    encrypt(originalFileName,CipherKey, fis, fos, encryptionType[j]);
+                    System.out.println("Encrypted"+encryptionType[j]+" on file: "+originalFileName+".txt");
+
+                    String decryptFileName = "decryptedFiles/decrypted"+currentType+"_"+originalFileName+".txt";
+                    FileInputStream decFis = new FileInputStream(encryptFileName);
+                    FileOutputStream decFos = new FileOutputStream(decryptFileName);
+                    decrypt(CipherKey, decFis, decFos, encryptionType[j]);
+                    System.out.println("Decrypted File "+ originalFileName);
+
+            }
+
+        }catch(IOException e){
+            System.out.println("File not found exception: "+e);
+        }
+
+    }
 
     public static void autoEncrypt(String CipherKey){
         try {
