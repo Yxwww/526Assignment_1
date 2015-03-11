@@ -52,8 +52,8 @@ SSH certificate generate section:
     Command:
     -   openssl pkcs12 -export -in ca.crt -inkey ca.key -out server.p12 -name serverP12 -CAfile ca.crt
     -   keytool -importkeystore -destkeystore server.keystore -srckeystore server.p12 -srcstoretype PKCS12 -srcstorepass yuxibruh
-        * Note that my password was set to: yuxibruh
-
+        * Note that my password was set to: yuxibruh for generate server.p12,
+        * and my destination password is set to : yuxibruh, need to be the same password for server.
 
     #    To generate Client truststore according to certificate
     Command:

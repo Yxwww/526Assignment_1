@@ -40,7 +40,7 @@ public class C_2_Server {
 
             SSLServerSocketFactory server = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
             SSLServerSocket sslServerSocket = (SSLServerSocket) server.createServerSocket(serverPort);
-
+            System.out.println("Server started on localhost:"+ serverPort);
             SSLSocket sslSocket = (SSLSocket) sslServerSocket.accept();
             InputStream sslIS = sslSocket.getInputStream();
 
@@ -59,7 +59,6 @@ public class C_2_Server {
                     break;
                 }
             }*/
-            System.out.println("Server started on localhost:"+ serverPort);
             String readString = null;
             clientHandler client = null;
             while(inputStream.read(readerBuffer)!=-1) {
